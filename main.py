@@ -1,42 +1,44 @@
-user_input = input()
-score = 0
+import urwid
 
 
-def check_digital(user_input):
-    return any(letter.isdigit() for letter in user_input)
+def check_digital(password_review):
+    return any(letter.isdigit() for letter in password_review)
 
 
-def check_letters(user_input):
-    return any(letter.isalpha() for letter in user_input)
+def check_letters(password_review):
+    return any(letter.isalpha() for letter in password_review)
 
 
-def check_upper_letters(user_input):
-    return any(letter.isupper() for letter in user_input)
+def check_upper_letters(password_review):
+    return any(letter.isupper() for letter in password_review)
 
 
-def check_length(user_input):
-    if len(user_input) > 12:
-        return True
+def check_length(password_review):
+    return len(password_review) > 12
 
 
-def check_symbols(user_input):
-    return any((letter.isdigit() == False and letter.isalpha() == False) for letter in user_input)
+def check_symbols(password_review):
+    return any((not letter.isdigit() and not letter.isalpha()) for letter in password_review)
 
 
-def check_lower_letters(user_input):
-    return any(letter.islower() for letter in user_input)
+def check_lower_letters(password_review):
+    return any(letter.islower() for letter in password_review)
 
 
-funcs_dict = [check_length(user_input), check_digital(user_input), check_letters(user_input),
-              check_lower_letters(user_input), check_upper_letters(user_input), check_symbols(user_input)]
-
-
-def main(score):
-    for func in funcs_dict:
-        if func:
+def main(edit, new_edit):
+    funcs_review = [check_length, check_digital, check_letters,
+                  check_lower_letters, check_upper_letters, check_symbols]
+    score = 0
+    for validator in funcs_review:
+        if validator(new_edit):
             score += 2
-    return score
+    reply.set_text("Рейтинг пароля: %s" % score)
 
 
 if __name__ == "__main__":
-    print("Рейтинг пароля:", main(score))
+    ask = urwid.Edit('Введите пароль:')
+    reply = urwid.Text("")
+    menu = urwid.Pile([ask, reply])
+    menu = urwid.Filler(menu, valign='middle')
+    urwid.connect_signal(ask, 'change', main)
+    urwid.MainLoop(menu).run()
